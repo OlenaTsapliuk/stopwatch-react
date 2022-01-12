@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { interval, scan, startWith } from "rxjs";
 import FormatTime from "./components/FormatTime";
-// import { Container, Button } from "@material-ui/core";
 import Container from "./components/Container";
 import s from "./App.module.css";
 
@@ -9,20 +8,33 @@ const stream$ = interval(1000);
 function App() {
   const [time, setTime] = useState(0);
   const [timerOn, setTimerOn] = useState(false);
+  const [PausedOn, setPausedOn] = useState(false);
 
   const start = () => {
     setTimerOn(true);
   };
-  const wait = () => {
-    setTimerOn(false);
-  };
+
   const stop = () => {
     setTimerOn(false);
     setTime(0);
   };
+
+  let clicks = 0;
   const doubleClick = () => {
+    clicks++;
     if (time > 0) {
       setTimerOn(true);
+    }
+
+    const timeout = setTimeout(() => {
+      clicks = 0;
+    }, 300);
+
+    if (clicks >= 2) {
+      setPausedOn(true);
+      clearTimeout(timeout);
+      clicks = 0;
+      setTimerOn(false);
     }
   };
 
@@ -58,11 +70,7 @@ function App() {
             </button>
           )}
           {(time || timerOn) && (
-            <button
-              onDoubleClick={wait}
-              onClick={doubleClick}
-              className={s.button}
-            >
+            <button onClick={doubleClick} className={s.button}>
               {timerOn ? "Wait" : "Start"}
             </button>
           )}
